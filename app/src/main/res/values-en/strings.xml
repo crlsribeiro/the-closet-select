@@ -1,0 +1,36 @@
+<resources>
+    <string name="app_name">The Closet Select</string>
+
+    <string name="login_title">THE CLOSET\nSELECT</string>
+    <string name="login_subtitle">YOUR SMART CLOSET</string>
+    <string name="label_email">E-MAIL</string>
+    <string name="label_password">PASSWORD</string>
+    <string name="btn_forgot_password">Forgot my password</string>
+    <string name="btn_enter">SIGN IN</string>
+    <string name="label_or">or</string>
+    <string name="btn_google">Continue with Google</string>
+    <string name="label_no_account">Don\'t have an account?</string>
+    <string name="btn_create_account">CREATE ACCOUNT</string>
+
+    <string name="reg_header">REGISTER</string>
+    <string name="reg_welcome">Welcome to\nTHE CLOSET SELECT</string>
+    <string name="reg_subtitle">CREATE YOUR ACCOUNT TO BUILD YOUR EXCLUSIVE COLLECTION.</string>
+    <string name="label_first_name">FIRST NAME</string>
+    <string name="label_last_name">LAST NAME</string>
+    <string name="label_birth_date">DATE OF BIRTH</string>
+    <string name="label_zodiac">ZODIAC SIGN</string>
+    <string name="label_repeat_password">REPEAT PASSWORD</string>
+    <string name="btn_save">SAVE</string>
+    <string name="legal_notice">BY REGISTERING, YOU AGREE TO OUR</string>
+    <string name="terms_of_use">TERMS OF USE</string>
+    <string name="privacy_policy">PRIVACY POLICY</string>
+
+    <string name="error_min_age">Minimum age: 14 years</string>
+    <string name="error_invalid_email">Invalid email</string>
+    <string name="error_password_length">Minimum 8 characters</string>
+
+    <string name="forgot_password_title">Forgot my password</string>
+    <string name="forgot_password_desc">Enter your email and we will send you a link to reset your password.</string>
+    <string name="btn_send">SEND</string>
+    <string name="btn_back_login">BACK TO LOGIN</string>
+</resources>
