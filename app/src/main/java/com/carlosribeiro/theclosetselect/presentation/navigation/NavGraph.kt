@@ -1,59 +1,104 @@
 package com.carlosribeiro.theclosetselect.presentation.navigation
 
 import androidx.compose.runtime.Composable
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
+import com.carlosribeiro.theclosetselect.presentation.screens.archive.ArchiveScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.aurapalette.AuraPaletteScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.dailyenergy.DailyEnergyScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.forgotpassword.ForgotPasswordScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.gerarlook.GerarLookScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.home.HomeScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.login.LoginScreen
-import com.carlosribeiro.theclosetselect.presentation.screens.login.LoginViewModel
 import com.carlosribeiro.theclosetselect.presentation.screens.register.RegisterScreen
-import com.carlosribeiro.theclosetselect.presentation.screens.register.RegisterViewModel
-import com.carlosribeiro.theclosetselect.presentation.screens.forgot_password.ForgotPasswordScreen
-import com.carlosribeiro.theclosetselect.presentation.screens.forgot_password.ForgotPasswordViewModel
+import com.google.firebase.auth.FirebaseAuth
 
 @Composable
-fun NavGraph() {
-    val navController = rememberNavController()
+fun NavGraph(navController: NavHostController) {
+    val startRoute = if (FirebaseAuth.getInstance().currentUser != null) "home" else "login"
 
-    NavHost(
-        navController = navController,
-        startDestination = Screen.Login.route
-    ) {
-        // Tela de Login
-        composable(Screen.Login.route) {
-            val loginViewModel: LoginViewModel = viewModel()
+    NavHost(navController = navController, startDestination = startRoute) {
+
+        composable("login") {
             LoginScreen(
-                viewModel = loginViewModel,
                 onNavigateToRegister = {
-                    navController.navigate(Screen.Register.route)
+                    navController.navigate("register")
+                },
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                        launchSingleTop = true
+                    }
                 },
                 onNavigateToForgotPassword = {
-                    navController.navigate(Screen.ForgotPassword.route)
+                    navController.navigate("forgot_password")
                 }
             )
         }
 
-        // Tela de Registro
-        composable(Screen.Register.route) {
-            val registerViewModel: RegisterViewModel = viewModel()
+        composable("register") {
             RegisterScreen(
-                viewModel = registerViewModel,
-                onBackClick = { // Agora o parâmetro 'onBackClick' existe na RegisterScreen que te passei
+                onNavigateToHome = {
+                    navController.navigate("home") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToLogin = {
                     navController.popBackStack()
                 }
             )
         }
 
-        // Tela de Esqueci Senha
-        composable(Screen.ForgotPassword.route) {
-            val forgotPasswordViewModel: ForgotPasswordViewModel = viewModel()
+        composable("forgot_password") {
             ForgotPasswordScreen(
-                viewModel = forgotPasswordViewModel,
-                onBackClick = {
-                    navController.popBackStack()
+                onNavigateToLogin = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
                 }
             )
+        }
+
+        composable("home") {
+            HomeScreen(
+                onLogout = {
+                    navController.navigate("login") {
+                        popUpTo(0) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                },
+                onNavigateToGerarLook = {
+                    navController.navigate("gerar_look")
+                },
+                onNavigateToDailyEnergy = {
+                    navController.navigate("daily_energy")
+                },
+                onNavigateToAuraPalette = {
+                    navController.navigate("aura_palette")
+                },
+                onNavigateToArchive = {
+                    navController.navigate("archive")
+                }
+            )
+        }
+
+        composable("gerar_look") {
+            GerarLookScreen()
+        }
+
+        composable("daily_energy") {
+            DailyEnergyScreen()
+        }
+
+        composable("aura_palette") {
+            AuraPaletteScreen()
+        }
+
+        composable("archive") {
+            ArchiveScreen()
         }
     }
 }

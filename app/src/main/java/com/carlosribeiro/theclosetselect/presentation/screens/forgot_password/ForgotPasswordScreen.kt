@@ -1,13 +1,24 @@
-package com.carlosribeiro.theclosetselect.presentation.screens.forgot_password
+package com.carlosribeiro.theclosetselect.presentation.screens.forgotpassword
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack // Import correto para evitar o Warning
-import androidx.compose.material3.*
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -17,101 +28,88 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carlosribeiro.theclosetselect.presentation.components.AuraButton
 import com.carlosribeiro.theclosetselect.presentation.components.AuraTextField
-import com.carlosribeiro.theclosetselect.presentation.theme.DeepBlack
-import com.carlosribeiro.theclosetselect.presentation.theme.GoldAura
+
+private val BackgroundColor = Color(0xFF0D0D0D)
+private val GoldColor = Color(0xFFB8972A)
+private val SubtitleColor = Color(0xFF888888)
+private val PinkColor = Color(0xFFE91E8C)
 
 @Composable
 fun ForgotPasswordScreen(
-    viewModel: ForgotPasswordViewModel,
-    onBackClick: () -> Unit
+    onNavigateToLogin: () -> Unit
 ) {
-    val email by viewModel.email.collectAsState()
+    var email by remember { mutableStateOf("") }
 
-    Column(
+    Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(DeepBlack)
-            .padding(24.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .background(BackgroundColor)
     ) {
-        // Top Bar com Seta de Voltar (Corrigida com AutoMirrored)
-        Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.CenterStart) {
-            IconButton(onClick = onBackClick) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                    contentDescription = "Back",
-                    tint = GoldAura
-                )
-            }
-            Text(
-                text = "THE CLOSET SELECT",
-                modifier = Modifier.fillMaxWidth(),
-                textAlign = TextAlign.Center,
-                color = GoldAura,
-                fontSize = 12.sp, // Um pouco menor para elegância
-                fontWeight = FontWeight.Light,
-                letterSpacing = 2.sp
-            )
-        }
-
-        Spacer(modifier = Modifier.height(60.dp))
-
-        Text(
-            text = "BEM-VINDO AO\nTHE CLOSET SELECT",
-            color = GoldAura,
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold,
-            textAlign = TextAlign.Center,
-            lineHeight = 30.sp
-        )
-
-        Text(
-            text = "Esqueci minha senha",
-            color = Color.White,
-            fontSize = 18.sp,
-            modifier = Modifier.padding(top = 24.dp)
-        )
-
-        Text(
-            text = "Informe seu e-mail e enviaremos um link para redefinir sua senha.",
-            color = Color.Gray,
-            fontSize = 14.sp,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 12.dp, bottom = 40.dp, start = 20.dp, end = 20.dp)
-        )
-
-        AuraTextField(
-            value = email,
-            onValueChange = viewModel::onEmailChange,
-            label = "E-MAIL"
-        )
-
-        Spacer(modifier = Modifier.height(32.dp))
-
-        AuraButton(
-            text = "ENVIAR LINK",
-            onClick = viewModel::onSendClick
-        )
-
-        TextButton(
-            onClick = onBackClick,
-            modifier = Modifier.padding(top = 16.dp)
+        IconButton(
+            onClick = onNavigateToLogin,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .padding(top = 16.dp, start = 8.dp)
         ) {
-            Text(
-                text = "VOLTAR PARA O LOGIN",
-                color = Color.Gray,
-                fontSize = 12.sp,
-                letterSpacing = 1.sp
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                contentDescription = "Voltar",
+                tint = PinkColor
             )
         }
 
-        Spacer(modifier = Modifier.weight(1f))
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(horizontal = 32.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            ForgotPasswordHeader()
 
-        Text(
-            text = "© 2026 THE CLOSET SELECT. ALL RIGHTS RESERVED.", // Atualizado para 2026
-            color = Color.DarkGray,
-            fontSize = 10.sp,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
+            Spacer(modifier = Modifier.height(48.dp))
+
+            AuraTextField(
+                value = email,
+                onValueChange = { email = it },
+                label = "E-MAIL",
+                placeholder = "seu@email.com"
+            )
+
+            Spacer(modifier = Modifier.height(32.dp))
+
+            AuraButton(
+                text = "ENVIAR LINK",
+                onClick = onNavigateToLogin
+            )
+        }
     }
+}
+
+@Composable
+private fun ForgotPasswordHeader() {
+    Text(
+        text = "✦",
+        color = GoldColor,
+        fontSize = 28.sp,
+        textAlign = TextAlign.Center,
+        modifier = Modifier.fillMaxWidth()
+    )
+    Spacer(modifier = Modifier.height(16.dp))
+    Text(
+        text = "RECUPERAR ACESSO",
+        color = Color.White,
+        fontSize = 20.sp,
+        fontWeight = FontWeight.Bold,
+        letterSpacing = 3.sp,
+        textAlign = TextAlign.Center
+    )
+    Spacer(modifier = Modifier.height(12.dp))
+    Text(
+        text = "Informe seu e-mail cadastrado e enviaremos um link para redefinir sua senha.",
+        color = SubtitleColor,
+        fontSize = 13.sp,
+        textAlign = TextAlign.Center,
+        lineHeight = 20.sp
+    )
 }

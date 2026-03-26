@@ -1,29 +1,29 @@
 package com.carlosribeiro.theclosetselect.presentation.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.carlosribeiro.theclosetselect.presentation.theme.GoldAura
+import androidx.compose.ui.unit.sp
 
 @Composable
-fun AuraButton(
+fun AuraSecondaryButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true
+    modifier: Modifier = Modifier
 ) {
-    Button(
+    OutlinedButton(
         onClick = onClick,
         modifier = modifier.fillMaxWidth().height(56.dp),
-        enabled = enabled,
         shape = RoundedCornerShape(28.dp),
-        colors = ButtonDefaults.buttonColors(containerColor = GoldAura, contentColor = Color.Black)
+        border = BorderStroke(1.dp, Color.White.copy(alpha = 0.2f)),
+        colors = ButtonDefaults.outlinedButtonColors(contentColor = Color.White)
     ) {
-        Text(text.uppercase(), fontWeight = FontWeight.Bold)
+        Text(text, fontSize = 14.sp)
     }
 }
