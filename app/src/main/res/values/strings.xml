@@ -1,0 +1,38 @@
+<resources>
+    <string name="app_name">The Closet Select</string>
+
+    <string name="login_title">THE CLOSET\nSELECT</string>
+    <string name="login_subtitle">SEU GUARDA-ROUPA INTELIGENTE</string>
+    <string name="label_email">E-MAIL</string>
+    <string name="label_password">SENHA</string>
+    <string name="btn_forgot_password">Esqueci minha senha</string>
+    <string name="btn_enter">ENTRAR</string>
+    <string name="label_or">ou</string>
+    <string name="btn_google">Continuar com Google</string>
+    <string name="label_no_account">Não tem conta?</string>
+    <string name="btn_create_account">CRIAR CONTA</string>
+
+    <string name="reg_header">REGISTRO</string>
+    <string name="reg_welcome">Bem-vindo ao\nTHE CLOSET SELECT</string>
+    <string name="reg_subtitle">CRIE SUA CONTA PARA CRIAR O SEU ACERVO EXCLUSIVO.</string>
+    <string name="label_first_name">NOME</string>
+    <string name="label_last_name">SOBRENOME</string>
+    <string name="label_birth_date">DATA DE NASCIMENTO</string>
+    <string name="label_zodiac">SIGNO</string>
+    <string name="label_repeat_password">REPETIR SENHA</string>
+    <string name="btn_save">SALVAR</string>
+    <string name="legal_notice">AO SE REGISTRAR, VOCÊ CONCORDA COM OS NOSSOS</string>
+    <string name="terms_of_use">TERMOS DE USO</string>
+    <string name="privacy_policy">POLÍTICA DE PRIVACIDADE</string>
+
+    <string name="error_min_age">Idade mínima: 14 anos</string>
+    <string name="error_invalid_email">E-mail inválido</string>
+    <string name="error_password_length">Mínimo 8 caracteres</string>
+
+    <string name="forgot_password_title">Esqueci minha senha</string>
+    <string name="forgot_password_desc">Informe seu e-mail e enviaremos um link para redefinir sua senha.</string>
+    <string name="btn_send">ENVIAR</string>
+    <string name="btn_back_login">VOLTAR PARA O LOGIN</string>
+
+
+</resources>
