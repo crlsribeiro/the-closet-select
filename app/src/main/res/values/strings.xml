@@ -34,5 +34,5 @@
     <string name="btn_send">ENVIAR</string>
     <string name="btn_back_login">VOLTAR PARA O LOGIN</string>
 
-
+    <string name="google_web_client_id" translatable="false">554726897179-b9m1gq5evv3hi49t08j3r73ejigbk1lq.apps.googleusercontent.com</string>
 </resources>

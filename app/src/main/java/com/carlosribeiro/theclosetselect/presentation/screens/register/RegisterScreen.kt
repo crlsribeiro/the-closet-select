@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -22,6 +23,7 @@ import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.outlined.Visibility
 import androidx.compose.material.icons.outlined.VisibilityOff
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.Icon
@@ -50,6 +52,8 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.carlosribeiro.theclosetselect.presentation.components.AuraButton
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
 
 private val BackgroundColor = Color(0xFF0D0D0D)
 private val GoldColor = Color(0xFFB8972A)
@@ -57,6 +61,7 @@ private val GoldLight = Color(0xFFD4A847)
 private val SubtitleColor = Color(0xFF888888)
 private val FieldBackground = Color(0xFF1A1A1A)
 private val FieldBorder = Color(0xFF2C2C2C)
+private val ErrorColor = Color(0xFFCF6679)
 
 private val zodiacSigns = listOf(
     "Áries", "Touro", "Gêmeos", "Câncer",
@@ -78,6 +83,71 @@ fun RegisterScreen(
     var confirmPassword by remember { mutableStateOf("") }
     var passwordVisible by remember { mutableStateOf(false) }
     var confirmPasswordVisible by remember { mutableStateOf(false) }
+    var isLoading by remember { mutableStateOf(false) }
+    var errorMessage by remember { mutableStateOf<String?>(null) }
+
+    val auth = FirebaseAuth.getInstance()
+    val firestore = FirebaseFirestore.getInstance()
+
+    fun onSaveClick() {
+        errorMessage = null
+
+        if (firstName.isBlank() || lastName.isBlank()) {
+            errorMessage = "Preencha nome e sobrenome."
+            return
+        }
+        if (email.isBlank()) {
+            errorMessage = "Preencha o e-mail."
+            return
+        }
+        if (selectedSign == "SELECIONE") {
+            errorMessage = "Selecione seu signo."
+            return
+        }
+        if (password.isBlank() || password.length < 6) {
+            errorMessage = "A senha deve ter pelo menos 6 caracteres."
+            return
+        }
+        if (password != confirmPassword) {
+            errorMessage = "As senhas não coincidem."
+            return
+        }
+
+        isLoading = true
+
+        auth.createUserWithEmailAndPassword(email.trim(), password)
+            .addOnSuccessListener { result ->
+                val uid = result.user?.uid ?: return@addOnSuccessListener
+                val userData = mapOf(
+                    "firstName" to firstName.trim(),
+                    "lastName" to lastName.trim(),
+                    "email" to email.trim(),
+                    "birthDate" to birthDate.trim(),
+                    "sign" to selectedSign,
+                    "createdAt" to System.currentTimeMillis()
+                )
+                firestore.collection("users").document(uid)
+                    .set(userData)
+                    .addOnSuccessListener {
+                        isLoading = false
+                        onNavigateToHome()
+                    }
+                    .addOnFailureListener {
+                        isLoading = false
+                        errorMessage = "Erro ao salvar dados. Tente novamente."
+                    }
+            }
+            .addOnFailureListener { e ->
+                isLoading = false
+                errorMessage = when {
+                    e.message?.contains("email address is already in use") == true ->
+                        "Este e-mail já está cadastrado."
+                    e.message?.contains("badly formatted") == true ->
+                        "E-mail inválido."
+                    else -> "Erro ao criar conta. Tente novamente."
+                }
+            }
+    }
 
     Box(
         modifier = Modifier
@@ -224,12 +294,30 @@ fun RegisterScreen(
                 )
             }
 
+            if (errorMessage != null) {
+                Spacer(modifier = Modifier.height(12.dp))
+                Text(
+                    text = errorMessage!!,
+                    color = ErrorColor,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(40.dp))
 
-            AuraButton(
-                text = "SALVAR",
-                onClick = onNavigateToHome
-            )
+            if (isLoading) {
+                CircularProgressIndicator(
+                    color = GoldColor,
+                    modifier = Modifier.size(40.dp)
+                )
+            } else {
+                AuraButton(
+                    text = "SALVAR",
+                    onClick = { onSaveClick() }
+                )
+            }
 
             Spacer(modifier = Modifier.height(16.dp))
 

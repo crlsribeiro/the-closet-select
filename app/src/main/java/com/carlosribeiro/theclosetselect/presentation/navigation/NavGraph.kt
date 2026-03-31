@@ -1,5 +1,6 @@
 package com.carlosribeiro.theclosetselect.presentation.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -21,6 +22,14 @@ fun NavGraph(navController: NavHostController) {
     NavHost(navController = navController, startDestination = startRoute) {
 
         composable("login") {
+            LaunchedEffect(Unit) {
+                if (FirebaseAuth.getInstance().currentUser != null) {
+                    navController.navigate("home") {
+                        popUpTo("login") { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            }
             LoginScreen(
                 onNavigateToRegister = {
                     navController.navigate("register")

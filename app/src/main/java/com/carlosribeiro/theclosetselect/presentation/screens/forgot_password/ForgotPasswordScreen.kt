@@ -9,16 +9,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,19 +26,23 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.carlosribeiro.theclosetselect.presentation.components.AuraButton
 import com.carlosribeiro.theclosetselect.presentation.components.AuraTextField
+import com.carlosribeiro.theclosetselect.presentation.screens.login.LoginViewModel
 
 private val BackgroundColor = Color(0xFF0D0D0D)
 private val GoldColor = Color(0xFFB8972A)
 private val SubtitleColor = Color(0xFF888888)
 private val PinkColor = Color(0xFFE91E8C)
+private val ErrorColor = Color(0xFFCF6679)
 
 @Composable
 fun ForgotPasswordScreen(
-    onNavigateToLogin: () -> Unit
+    onNavigateToLogin: () -> Unit,
+    viewModel: LoginViewModel = viewModel()
 ) {
-    var email by remember { mutableStateOf("") }
+    val uiState by viewModel.uiState.collectAsState()
 
     Box(
         modifier = Modifier
@@ -70,18 +74,39 @@ fun ForgotPasswordScreen(
             Spacer(modifier = Modifier.height(48.dp))
 
             AuraTextField(
-                value = email,
-                onValueChange = { email = it },
+                value = uiState.email,
+                onValueChange = viewModel::onEmailChange,
                 label = "E-MAIL",
                 placeholder = "seu@email.com"
             )
 
+            if (uiState.errorMessage != null) {
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = uiState.errorMessage!!,
+                    color = ErrorColor,
+                    fontSize = 12.sp,
+                    textAlign = TextAlign.Center,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            }
+
             Spacer(modifier = Modifier.height(32.dp))
 
-            AuraButton(
-                text = "ENVIAR LINK",
-                onClick = onNavigateToLogin
-            )
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    color = GoldColor,
+                    modifier = Modifier.size(40.dp)
+                )
+            } else {
+                AuraButton(
+                    text = "ENVIAR LINK",
+                    onClick = {
+                        viewModel.onForgotPasswordClick(uiState.email)
+                        onNavigateToLogin()
+                    }
+                )
+            }
         }
     }
 }
