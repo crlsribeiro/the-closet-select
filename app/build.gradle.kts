@@ -14,32 +14,52 @@ plugins {
 }
 
 android {
-    namespace = "com.carlosribeiro.theclosetselect"
+    namespace  = "com.carlosribeiro.theclosetselect"
     compileSdk = 36
 
     defaultConfig {
         applicationId = "com.carlosribeiro.theclosetselect"
-        minSdk = 26
-        targetSdk = 35
-        versionCode = 1
-        versionName = "1.0"
+        minSdk        = 26
+        targetSdk     = 35
+        versionCode   = 1
+        versionName   = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         buildConfigField(
             "String",
             "GOOGLE_WEB_CLIENT_ID",
-            "\"${localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
+            "\"${System.getenv("GOOGLE_WEB_CLIENT_ID") ?: localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
         )
     }
 
+    // ─────────────────────────────────────────
+    //  Signing — lê do CI (env vars) ou local.properties
+    // ─────────────────────────────────────────
+    signingConfigs {
+        create("release") {
+            storeFile     = file(System.getenv("KEYSTORE_PATH")
+                ?: localProperties.getProperty("KEYSTORE_PATH", ""))
+            storePassword = System.getenv("KEYSTORE_PASSWORD")
+                ?: localProperties.getProperty("KEYSTORE_PASSWORD", "")
+            keyAlias      = System.getenv("KEY_ALIAS")
+                ?: localProperties.getProperty("KEY_ALIAS", "")
+            keyPassword   = System.getenv("KEY_PASSWORD")
+                ?: localProperties.getProperty("KEY_PASSWORD", "")
+        }
+    }
+
     buildTypes {
-        release {
-            isMinifyEnabled = false
+        getByName("release") {
+            isMinifyEnabled   = false
+            signingConfig     = signingConfigs.getByName("release")
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        getByName("debug") {
+            isDebuggable = true
         }
     }
 
@@ -53,7 +73,7 @@ android {
     }
 
     buildFeatures {
-        compose = true
+        compose     = true
         buildConfig = true
     }
 }
