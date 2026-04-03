@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="48dp"
+    android:viewportWidth="40"
+    android:viewportHeight="48">
+
+    <!-- Perna esquerda do compasso -->
+    <path
+        android:pathData="M20,4 L8,40"
+        android:strokeColor="#B8972A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+
+    <!-- Perna direita do compasso -->
+    <path
+        android:pathData="M20,4 L32,40"
+        android:strokeColor="#B8972A"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round" />
+
+    <!-- Ponta esquerda -->
+    <path
+        android:pathData="M8,40 L6,44 L10,42 Z"
+        android:fillColor="#B8972A" />
+
+    <!-- Ponta direita -->
+    <path
+        android:pathData="M32,40 L30,42 L34,44 Z"
+        android:fillColor="#B8972A" />
+
+    <!-- Arco superior (charneira) -->
+    <path
+        android:pathData="M14,18 A8,8 0 0,0 26,18"
+        android:strokeColor="#B8972A"
+        android:strokeWidth="2.5"
+        android:fillColor="@android:color/transparent"
+        android:strokeLineCap="round" />
+
+    <!-- Ponto central topo -->
+    <path
+        android:pathData="M20,4 m-2,0 a2,2 0 1,0 4,0 a2,2 0 1,0 -4,0"
+        android:fillColor="#B8972A" />
+
+</vector>

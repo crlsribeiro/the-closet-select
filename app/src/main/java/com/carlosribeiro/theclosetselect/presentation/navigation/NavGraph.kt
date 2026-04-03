@@ -8,45 +8,67 @@ import androidx.navigation.compose.composable
 import com.carlosribeiro.theclosetselect.presentation.screens.archive.ArchiveScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.aurapalette.AuraPaletteScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.dailyenergy.DailyEnergyScreen
-import com.carlosribeiro.theclosetselect.presentation.screens.forgotpassword.ForgotPasswordScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.forgot_password.ForgotPasswordScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.gerarlook.GerarLookScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.home.HomeScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.login.LoginScreen
 import com.carlosribeiro.theclosetselect.presentation.screens.register.RegisterScreen
+import com.carlosribeiro.theclosetselect.presentation.screens.splash.SplashScreen
 import com.google.firebase.auth.FirebaseAuth
 
 @Composable
 fun NavGraph(navController: NavHostController) {
-    val startRoute = if (FirebaseAuth.getInstance().currentUser != null) "home" else "login"
 
-    NavHost(navController = navController, startDestination = startRoute) {
+    NavHost(
+        navController = navController,
+        startDestination = Screen.Splash.route
+    ) {
 
-        composable("login") {
+        // ── SPLASH ──────────────────────────────────────────────────────────
+        composable(Screen.Splash.route) {
+            SplashScreen(
+                onSplashFinished = {
+                    val destination = if (FirebaseAuth.getInstance().currentUser != null) {
+                        "home"
+                    } else {
+                        Screen.Login.route
+                    }
+                    navController.navigate(destination) {
+                        popUpTo(Screen.Splash.route) { inclusive = true }
+                        launchSingleTop = true
+                    }
+                }
+            )
+        }
+
+        // ── LOGIN ────────────────────────────────────────────────────────────
+        composable(Screen.Login.route) {
             LaunchedEffect(Unit) {
                 if (FirebaseAuth.getInstance().currentUser != null) {
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo(Screen.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
                 }
             }
             LoginScreen(
                 onNavigateToRegister = {
-                    navController.navigate("register")
+                    navController.navigate(Screen.Register.route)
                 },
                 onNavigateToHome = {
                     navController.navigate("home") {
-                        popUpTo("login") { inclusive = true }
+                        popUpTo(Screen.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
                 onNavigateToForgotPassword = {
-                    navController.navigate("forgot_password")
+                    navController.navigate(Screen.ForgotPassword.route)
                 }
             )
         }
 
-        composable("register") {
+        // ── REGISTER ─────────────────────────────────────────────────────────
+        composable(Screen.Register.route) {
             RegisterScreen(
                 onNavigateToHome = {
                     navController.navigate("home") {
@@ -60,10 +82,11 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        composable("forgot_password") {
+        // ── FORGOT PASSWORD ───────────────────────────────────────────────────
+        composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
                 onNavigateToLogin = {
-                    navController.navigate("login") {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -71,10 +94,11 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
+        // ── HOME ──────────────────────────────────────────────────────────────
         composable("home") {
             HomeScreen(
                 onLogout = {
-                    navController.navigate("login") {
+                    navController.navigate(Screen.Login.route) {
                         popUpTo(0) { inclusive = true }
                         launchSingleTop = true
                     }
@@ -94,6 +118,7 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
+        // ── OUTRAS TELAS ──────────────────────────────────────────────────────
         composable("gerar_look") {
             GerarLookScreen()
         }

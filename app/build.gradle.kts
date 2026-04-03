@@ -31,11 +31,15 @@ android {
             "GOOGLE_WEB_CLIENT_ID",
             "\"${System.getenv("GOOGLE_WEB_CLIENT_ID") ?: localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
         )
+
+        // Chave da API Anthropic — adicione no local.properties: ANTHROPIC_API_KEY=sk-ant-...
+        buildConfigField(
+            "String",
+            "ANTHROPIC_API_KEY",
+            "\"${System.getenv("ANTHROPIC_API_KEY") ?: localProperties.getProperty("ANTHROPIC_API_KEY", "")}\""
+        )
     }
 
-    // ─────────────────────────────────────────
-    //  Signing — lê do CI (env vars) ou local.properties
-    // ─────────────────────────────────────────
     signingConfigs {
         create("release") {
             val keystorePath = System.getenv("KEYSTORE_PATH")
@@ -98,6 +102,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
+    implementation("com.google.firebase:firebase-storage-ktx")        // ← Firebase Storage
 
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")
@@ -107,6 +112,24 @@ dependencies {
 
     // Coil
     implementation("io.coil-kt:coil-compose:2.6.0")
+
+    // ── CameraX ──────────────────────────────────────────────────────────────
+    implementation("androidx.camera:camera-core:1.3.4")
+    implementation("androidx.camera:camera-camera2:1.3.4")
+    implementation("androidx.camera:camera-lifecycle:1.3.4")
+    implementation("androidx.camera:camera-view:1.3.4")
+
+    // Permissões (camera)
+    implementation("com.google.accompanist:accompanist-permissions:0.34.0")
+
+    // ── Anthropic (Claude Vision) ─────────────────────────────────────────────
+    implementation("com.anthropic:sdk:0.8.0")
+
+    // OkHttp (chamadas HTTP para Anthropic se preferir REST direto)
+    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
+    // JSON parsing
+    implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Test
     testImplementation(libs.junit)
