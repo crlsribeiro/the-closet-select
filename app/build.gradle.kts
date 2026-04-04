@@ -11,6 +11,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.kotlin.compose)
     id("com.google.gms.google-services")
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.9.24"
 }
 
 android {
@@ -32,7 +33,6 @@ android {
             "\"${System.getenv("GOOGLE_WEB_CLIENT_ID") ?: localProperties.getProperty("GOOGLE_WEB_CLIENT_ID", "")}\""
         )
 
-        // Chave da API Anthropic — adicione no local.properties: ANTHROPIC_API_KEY=sk-ant-...
         buildConfigField(
             "String",
             "ANTHROPIC_API_KEY",
@@ -102,7 +102,7 @@ dependencies {
     implementation(platform("com.google.firebase:firebase-bom:33.1.0"))
     implementation("com.google.firebase:firebase-auth-ktx")
     implementation("com.google.firebase:firebase-firestore-ktx")
-    implementation("com.google.firebase:firebase-storage-ktx")        // ← Firebase Storage
+    implementation("com.google.firebase:firebase-storage-ktx")
 
     // Google Sign-In
     implementation("com.google.android.gms:play-services-auth:21.2.0")
@@ -119,16 +119,11 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
 
-    // Permissões (camera)
+    // Permissões Compose
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
-    // ── Anthropic (Claude Vision) ─────────────────────────────────────────────
-    implementation("com.anthropic:sdk:0.8.0")
-
-    // OkHttp (chamadas HTTP para Anthropic se preferir REST direto)
+    // ── HTTP + JSON (chamadas REST para Anthropic API) ────────────────────────
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
-
-    // JSON parsing
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
     // Test
