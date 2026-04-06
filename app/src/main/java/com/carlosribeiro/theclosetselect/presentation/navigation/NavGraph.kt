@@ -1,7 +1,7 @@
 package com.carlosribeiro.theclosetselect.presentation.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -24,7 +24,6 @@ fun NavGraph(navController: NavHostController) {
         startDestination = Screen.Splash.route
     ) {
 
-        // ── SPLASH ──────────────────────────────────────────────────────────
         composable(Screen.Splash.route) {
             SplashScreen(
                 onSplashFinished = {
@@ -41,7 +40,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // ── LOGIN ────────────────────────────────────────────────────────────
         composable(Screen.Login.route) {
             LaunchedEffect(Unit) {
                 if (FirebaseAuth.getInstance().currentUser != null) {
@@ -52,22 +50,17 @@ fun NavGraph(navController: NavHostController) {
                 }
             }
             LoginScreen(
-                onNavigateToRegister = {
-                    navController.navigate(Screen.Register.route)
-                },
+                onNavigateToRegister = { navController.navigate(Screen.Register.route) },
                 onNavigateToHome = {
                     navController.navigate("home") {
                         popUpTo(Screen.Login.route) { inclusive = true }
                         launchSingleTop = true
                     }
                 },
-                onNavigateToForgotPassword = {
-                    navController.navigate(Screen.ForgotPassword.route)
-                }
+                onNavigateToForgotPassword = { navController.navigate(Screen.ForgotPassword.route) }
             )
         }
 
-        // ── REGISTER ─────────────────────────────────────────────────────────
         composable(Screen.Register.route) {
             RegisterScreen(
                 onNavigateToHome = {
@@ -76,13 +69,10 @@ fun NavGraph(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToLogin = {
-                    navController.popBackStack()
-                }
+                onNavigateToLogin = { navController.popBackStack() }
             )
         }
 
-        // ── FORGOT PASSWORD ───────────────────────────────────────────────────
         composable(Screen.ForgotPassword.route) {
             ForgotPasswordScreen(
                 onNavigateToLogin = {
@@ -94,7 +84,6 @@ fun NavGraph(navController: NavHostController) {
             )
         }
 
-        // ── HOME ──────────────────────────────────────────────────────────────
         composable("home") {
             HomeScreen(
                 onLogout = {
@@ -103,22 +92,13 @@ fun NavGraph(navController: NavHostController) {
                         launchSingleTop = true
                     }
                 },
-                onNavigateToGerarLook = {
-                    navController.navigate("gerar_look")
-                },
-                onNavigateToDailyEnergy = {
-                    navController.navigate("daily_energy")
-                },
-                onNavigateToAuraPalette = {
-                    navController.navigate("aura_palette")
-                },
-                onNavigateToArchive = {
-                    navController.navigate("archive")
-                }
+                onNavigateToGerarLook = { navController.navigate("gerar_look") },
+                onNavigateToDailyEnergy = { navController.navigate("daily_energy") },
+                onNavigateToAuraPalette = { navController.navigate("aura_palette") },
+                onNavigateToArchive = { navController.navigate("archive") }
             )
         }
 
-        // ── OUTRAS TELAS ──────────────────────────────────────────────────────
         composable("gerar_look") {
             GerarLookScreen()
         }
@@ -128,11 +108,15 @@ fun NavGraph(navController: NavHostController) {
         }
 
         composable("aura_palette") {
-            AuraPaletteScreen()
+            AuraPaletteScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
 
         composable("archive") {
-            ArchiveScreen()
+            ArchiveScreen(
+                onNavigateBack = { navController.popBackStack() }
+            )
         }
     }
 }

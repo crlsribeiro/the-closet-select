@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -69,7 +70,11 @@ fun LoginScreen(
             try {
                 val account = task.getResult(ApiException::class.java)
                 account.idToken?.let { viewModel.onGoogleSignInResult(it) }
-            } catch (_: ApiException) { }
+            } catch (_: ApiException) {
+                viewModel.clearError()
+            }
+        } else {
+            viewModel.clearError()
         }
     }
 
@@ -80,6 +85,31 @@ fun LoginScreen(
         }
     }
 
+    LoginContent(
+        uiState = uiState,
+        onEmailChange = viewModel::onEmailChange,
+        onPasswordChange = viewModel::onPasswordChange,
+        onLoginClick = viewModel::onLoginClick,
+        onGoogleClick = {
+            viewModel.onGoogleSignInStarted()
+            googleSignInClient.signOut()
+            googleLauncher.launch(googleSignInClient.signInIntent)
+        },
+        onForgotPassword = onNavigateToForgotPassword,
+        onNavigateToRegister = onNavigateToRegister
+    )
+}
+
+@Composable
+private fun LoginContent(
+    uiState: LoginUiState,
+    onEmailChange: (String) -> Unit,
+    onPasswordChange: (String) -> Unit,
+    onLoginClick: () -> Unit,
+    onGoogleClick: () -> Unit,
+    onForgotPassword: () -> Unit,
+    onNavigateToRegister: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
 
         Image(
@@ -111,7 +141,6 @@ fun LoginScreen(
                     modifier = Modifier.fillMaxWidth()
                 ) {
 
-                    // Logo ic_logo — crie res/drawable/ic_logo.xml (vetor do compasso)
                     Icon(
                         painter = painterResource(id = R.drawable.ic_logo),
                         contentDescription = "Logo",
@@ -153,14 +182,27 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    LoginField("E-MAIL ADDRESS", uiState.email, viewModel::onEmailChange, "executive@atelier.com")
-                    Spacer(modifier = Modifier.height(20.dp))
-                    LoginField("PASSWORD", uiState.password, viewModel::onPasswordChange, "••••••••", isPassword = true)
+                    AuraTextField(
+                        value = uiState.email,
+                        onValueChange = onEmailChange,
+                        label = "E-mail address",
+                        placeholder = "executive@atelier.com"
+                    )
+
+                    Spacer(modifier = Modifier.height(16.dp))
+
+                    AuraTextField(
+                        value = uiState.password,
+                        onValueChange = onPasswordChange,
+                        label = "Password",
+                        placeholder = "••••••••",
+                        isPassword = true
+                    )
 
                     if (uiState.errorMessage != null) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
-                            text = uiState.errorMessage!!,
+                            text = uiState.errorMessage,
                             color = ErrorColor,
                             fontSize = 12.sp,
                             textAlign = TextAlign.Center,
@@ -171,12 +213,14 @@ fun LoginScreen(
                     Spacer(modifier = Modifier.height(28.dp))
 
                     if (uiState.isLoading) {
-                        CircularProgressIndicator(color = Gold, modifier = Modifier.size(40.dp))
+                        CircularProgressIndicator(
+                            color = Gold,
+                            modifier = Modifier.size(40.dp)
+                        )
                     } else {
 
-                        // ── SIGN IN ───────────────────────────────────────────
                         Button(
-                            onClick = viewModel::onLoginClick,
+                            onClick = onLoginClick,
                             modifier = Modifier.fillMaxWidth().height(52.dp),
                             shape = RoundedCornerShape(6.dp),
                             colors = ButtonDefaults.buttonColors(containerColor = Color.Transparent),
@@ -200,41 +244,36 @@ fun LoginScreen(
 
                         Spacer(modifier = Modifier.height(12.dp))
 
-                        // ── Forgot password ───────────────────────────────────
-                        TextButton(onClick = onNavigateToForgotPassword) {
-                            Text(text = "Forgot password?", color = Gold, fontSize = 13.sp)
+                        TextButton(onClick = onForgotPassword) {
+                            Text("Forgot password?", color = Gold, fontSize = 13.sp)
                         }
 
-                        Spacer(modifier = Modifier.height(4.dp))
+                        Spacer(modifier = Modifier.height(8.dp))
 
-                        // ── Divider ───────────────────────────────────────────
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.fillMaxWidth()
                         ) {
                             HorizontalDivider(modifier = Modifier.weight(1f), color = FieldBorder)
-                            Text(text = "  or  ", color = TextMuted, fontSize = 12.sp)
+                            Text("  or  ", color = TextMuted, fontSize = 12.sp)
                             HorizontalDivider(modifier = Modifier.weight(1f), color = FieldBorder)
                         }
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(12.dp))
 
-                        // ── Google ────────────────────────────────────────────
                         OutlinedButton(
-                            onClick = {
-                                googleSignInClient.signOut()
-                                googleLauncher.launch(googleSignInClient.signInIntent)
-                            },
+                            onClick = onGoogleClick,
                             modifier = Modifier.fillMaxWidth().height(52.dp),
                             shape = RoundedCornerShape(6.dp),
                             border = androidx.compose.foundation.BorderStroke(1.dp, FieldBorder),
-                            colors = ButtonDefaults.outlinedButtonColors(containerColor = Color(0x22FFFFFF))
+                            colors = ButtonDefaults.outlinedButtonColors(
+                                containerColor = Color.White
+                            )
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.Center
                             ) {
-                                // ic_google — crie res/drawable/ic_google.xml
                                 Icon(
                                     painter = painterResource(id = R.drawable.ic_google),
                                     contentDescription = "Google",
@@ -254,12 +293,15 @@ fun LoginScreen(
 
                     Spacer(modifier = Modifier.height(24.dp))
 
-                    // ── Footer ────────────────────────────────────────────────
                     TextButton(onClick = onNavigateToRegister) {
                         Text(
                             text = buildAnnotatedString {
-                                withStyle(SpanStyle(color = TextMuted, fontSize = 13.sp)) { append("Don't have an account? ") }
-                                withStyle(SpanStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)) { append("Sign up") }
+                                withStyle(SpanStyle(color = TextMuted, fontSize = 13.sp)) {
+                                    append("Don't have an account? ")
+                                }
+                                withStyle(SpanStyle(color = TextPrimary, fontSize = 13.sp, fontWeight = FontWeight.Bold)) {
+                                    append("Sign up")
+                                }
                             }
                         )
                     }
@@ -269,17 +311,30 @@ fun LoginScreen(
     }
 }
 
+@Preview(showBackground = true, showSystemUi = true)
 @Composable
-private fun LoginField(
-    label: String,
-    value: String,
-    onValueChange: (String) -> Unit,
-    placeholder: String,
-    isPassword: Boolean = false
-) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(text = label, color = TextMuted, fontSize = 10.sp, fontWeight = FontWeight.Medium, letterSpacing = 2.sp)
-        Spacer(modifier = Modifier.height(8.dp))
-        AuraTextField(value = value, onValueChange = onValueChange, label = placeholder, isPassword = isPassword)
-    }
+private fun LoginScreenPreview() {
+    LoginContent(
+        uiState = LoginUiState(),
+        onEmailChange = {},
+        onPasswordChange = {},
+        onLoginClick = {},
+        onGoogleClick = {},
+        onForgotPassword = {},
+        onNavigateToRegister = {}
+    )
+}
+
+@Preview(showBackground = true, showSystemUi = true, name = "Login Loading")
+@Composable
+private fun LoginScreenLoadingPreview() {
+    LoginContent(
+        uiState = LoginUiState(isLoading = true),
+        onEmailChange = {},
+        onPasswordChange = {},
+        onLoginClick = {},
+        onGoogleClick = {},
+        onForgotPassword = {},
+        onNavigateToRegister = {}
+    )
 }
