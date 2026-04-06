@@ -38,6 +38,12 @@ android {
             "ANTHROPIC_API_KEY",
             "\"${System.getenv("ANTHROPIC_API_KEY") ?: localProperties.getProperty("ANTHROPIC_API_KEY", "")}\""
         )
+
+        buildConfigField(
+            "String",
+            "GEMINI_API_KEY",
+            "\"${System.getenv("GEMINI_API_KEY") ?: localProperties.getProperty("GEMINI_API_KEY", "")}\""
+        )
     }
 
     signingConfigs {
@@ -119,10 +125,13 @@ dependencies {
     implementation("androidx.camera:camera-lifecycle:1.3.4")
     implementation("androidx.camera:camera-view:1.3.4")
 
+    // Guava — necessário para ListenableFuture do CameraX
+    implementation("com.google.guava:guava:32.1.3-android")
+
     // Permissões Compose
     implementation("com.google.accompanist:accompanist-permissions:0.34.0")
 
-    // ── HTTP + JSON (chamadas REST para Anthropic API) ────────────────────────
+    // ── HTTP + JSON ───────────────────────────────────────────────────────────
     implementation("com.squareup.okhttp3:okhttp:4.12.0")
     implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.3")
 
