@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -19,21 +20,25 @@ import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.carlosribeiro.theclosetselect.R
 import com.carlosribeiro.theclosetselect.presentation.components.AuraTextField
+import kotlinx.coroutines.delay
 
 private val Gold        = Color(0xFFB8972A)
 private val GoldLight   = Color(0xFFD4AF5A)
 private val CardBg      = Color(0xCCE8E4DC)
-private val TextPrimary = Color(0xFF000000)   // preto
-private val TextLabel   = Color(0xFF000000)   // preto para labels
-private val TextMuted   = Color(0xFF444444)   // quase preto para subtítulos
+private val TextPrimary = Color(0xFF000000)
+private val TextMuted   = Color(0xFF444444)
 private val ErrorColor  = Color(0xFFCF6679)
+private val SuccessColor = Color(0xFF4CAF50)
 private val CardShape   = RoundedCornerShape(24.dp)
 
 @Composable
@@ -43,9 +48,14 @@ fun RegisterScreen(
     viewModel: RegisterViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+    var showSuccess by remember { mutableStateOf(false) }
 
     LaunchedEffect(uiState.isSuccess) {
-        if (uiState.isSuccess) onNavigateToHome()
+        if (uiState.isSuccess) {
+            showSuccess = true
+            delay(2000)
+            onNavigateToHome()
+        }
     }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -118,24 +128,102 @@ fun RegisterScreen(
 
                     Spacer(modifier = Modifier.height(32.dp))
 
-                    RegisterField("FIRST NAME",       uiState.firstName,       viewModel::onFirstNameChange,       "Your first name")
+                    // Campos
+                    RegisterField("FIRST NAME", uiState.firstName, viewModel::onFirstNameChange, "Your first name", KeyboardType.Text)
                     Spacer(modifier = Modifier.height(20.dp))
-                    RegisterField("LAST NAME",         uiState.lastName,        viewModel::onLastNameChange,        "Your last name")
+                    RegisterField("LAST NAME", uiState.lastName, viewModel::onLastNameChange, "Your last name", KeyboardType.Text)
                     Spacer(modifier = Modifier.height(20.dp))
-                    RegisterField("E-MAIL ADDRESS",    uiState.email,           viewModel::onEmailChange,           "executive@atelier.com")
-                    Spacer(modifier = Modifier.height(20.dp))
-                    RegisterField("DATE OF BIRTH",     uiState.birthDate,       viewModel::onDateOfBirthChange,     "DD/MM/YYYY")
-                    Spacer(modifier = Modifier.height(20.dp))
-                    RegisterField("PASSWORD",          uiState.password,        viewModel::onPasswordChange,        "••••••••", isPassword = true)
-                    Spacer(modifier = Modifier.height(20.dp))
-                    RegisterField("CONFIRM PASSWORD",  uiState.confirmPassword, viewModel::onConfirmPasswordChange, "••••••••", isPassword = true)
 
+                    // Email com validação visual
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "E-MAIL ADDRESS", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        AuraTextField(
+                            value = uiState.email,
+                            onValueChange = viewModel::onEmailChange,
+                            label = "executive@atelier.com",
+                            isPassword = false
+                        )
+                        if (uiState.email.isNotEmpty() && !uiState.email.contains("@")) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "E-mail inválido",
+                                color = ErrorColor,
+                                fontSize = 11.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Data de nascimento com formato por locale
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(
+                            text = "DATE OF BIRTH",
+                            color = TextPrimary,
+                            fontSize = 12.sp,
+                            fontWeight = FontWeight.SemiBold,
+                            letterSpacing = 2.sp
+                        )
+                        Spacer(modifier = Modifier.height(8.dp))
+                        AuraTextField(
+                            value = uiState.birthDate,
+                            onValueChange = viewModel::onDateOfBirthChange,
+                            label = uiState.dateHint,
+                            isPassword = false
+                        )
+                        if (uiState.zodiacSign.isNotEmpty()) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(
+                                text = "✦ ${uiState.zodiacSign}",
+                                color = Gold,
+                                fontSize = 11.sp,
+                                fontWeight = FontWeight.Medium,
+                                letterSpacing = 1.sp
+                            )
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(20.dp))
+                    RegisterField("PASSWORD", uiState.password, viewModel::onPasswordChange, "••••••••", KeyboardType.Password, isPassword = true)
+                    Spacer(modifier = Modifier.height(20.dp))
+
+                    // Confirm password com validação visual
+                    Column(modifier = Modifier.fillMaxWidth()) {
+                        Text(text = "CONFIRM PASSWORD", color = TextPrimary, fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp)
+                        Spacer(modifier = Modifier.height(8.dp))
+                        AuraTextField(
+                            value = uiState.confirmPassword,
+                            onValueChange = viewModel::onConfirmPasswordChange,
+                            label = "••••••••",
+                            isPassword = true
+                        )
+                        if (uiState.confirmPassword.isNotEmpty() && uiState.password != uiState.confirmPassword) {
+                            Spacer(modifier = Modifier.height(4.dp))
+                            Text(text = "As senhas não coincidem", color = ErrorColor, fontSize = 11.sp)
+                        }
+                    }
+
+                    // Erro geral
                     if (uiState.errorMessage != null) {
                         Spacer(modifier = Modifier.height(10.dp))
                         Text(
                             text = uiState.errorMessage!!,
                             color = ErrorColor,
                             fontSize = 13.sp,
+                            textAlign = TextAlign.Center,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
+
+                    // Sucesso
+                    if (showSuccess) {
+                        Spacer(modifier = Modifier.height(10.dp))
+                        Text(
+                            text = "✦ Usuário cadastrado com sucesso!",
+                            color = SuccessColor,
+                            fontSize = 13.sp,
+                            fontWeight = FontWeight.Medium,
                             textAlign = TextAlign.Center,
                             modifier = Modifier.fillMaxWidth()
                         )
@@ -157,7 +245,12 @@ fun RegisterScreen(
                             Box(
                                 modifier = Modifier
                                     .fillMaxSize()
-                                    .background(Brush.horizontalGradient(listOf(Gold, GoldLight, Gold))),
+                                    .background(
+                                        if (uiState.canSave)
+                                            Brush.horizontalGradient(listOf(Gold, GoldLight, Gold))
+                                        else
+                                            Brush.horizontalGradient(listOf(Color(0xFF888888), Color(0xFFAAAAAA), Color(0xFF888888)))
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Text(
@@ -197,16 +290,11 @@ private fun RegisterField(
     value: String,
     onValueChange: (String) -> Unit,
     placeholder: String,
+    keyboardType: KeyboardType = KeyboardType.Text,
     isPassword: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            color = TextLabel,
-            fontSize = 12.sp,
-            fontWeight = FontWeight.SemiBold,
-            letterSpacing = 2.sp
-        )
+        Text(text = label, color = Color(0xFF000000), fontSize = 12.sp, fontWeight = FontWeight.SemiBold, letterSpacing = 2.sp)
         Spacer(modifier = Modifier.height(8.dp))
         AuraTextField(
             value = value,
@@ -215,4 +303,10 @@ private fun RegisterField(
             isPassword = isPassword
         )
     }
+}
+
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun RegisterScreenPreview() {
+    RegisterScreen(onNavigateToHome = {}, onNavigateToLogin = {})
 }

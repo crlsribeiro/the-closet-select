@@ -1,26 +1,12 @@
 package com.carlosribeiro.theclosetselect.presentation.screens.dailyenergy
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -33,9 +19,8 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FirebaseFirestore
 
 private val BackgroundColor = Color(0xFF0D0D0D)
-private val CardBackground = Color(0xFF1A1A1A)
-private val GoldColor = Color(0xFFB8972A)
-private val SubtitleColor = Color(0xFF888888)
+private val CardBackground  = Color(0xFF1A1A1A)
+private val SubtitleColor   = Color(0xFF888888)
 
 data class ZodiacInfo(
     val name: String,
@@ -123,6 +108,14 @@ private val zodiacData = mapOf(
     )
 )
 
+fun getDailyColor(zodiacSign: String): Color {
+    return zodiacData[zodiacSign]?.colorPalette?.firstOrNull()?.first ?: Color(0xFFB8972A)
+}
+
+fun getDailyColorName(zodiacSign: String): String {
+    return zodiacData[zodiacSign]?.colorPalette?.firstOrNull()?.second ?: "DOURADO"
+}
+
 @Composable
 fun DailyEnergyScreen() {
     var userSign by remember { mutableStateOf("Leão") }
@@ -135,7 +128,8 @@ fun DailyEnergyScreen() {
                 .document(uid)
                 .get()
                 .addOnSuccessListener { doc ->
-                    val sign = doc.getString("sign")
+                    // Corrigido: campo correto é "zodiacSign"
+                    val sign = doc.getString("zodiacSign")
                     if (!sign.isNullOrBlank()) userSign = sign
                 }
         }
@@ -157,19 +151,12 @@ fun DailyEnergyScreen() {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             DailyEnergyHeader(zodiac)
-
             Spacer(modifier = Modifier.height(32.dp))
-
             EnergyMessageCard(zodiac)
-
             Spacer(modifier = Modifier.height(24.dp))
-
             ConfidenceMeterCard(zodiac)
-
             Spacer(modifier = Modifier.height(24.dp))
-
             ColorPaletteCard(zodiac)
-
             Spacer(modifier = Modifier.height(32.dp))
         }
     }
@@ -177,113 +164,41 @@ fun DailyEnergyScreen() {
 
 @Composable
 private fun DailyEnergyHeader(zodiac: ZodiacInfo) {
-    Text(
-        text = zodiac.symbol,
-        color = zodiac.color,
-        fontSize = 64.sp,
-        textAlign = TextAlign.Center
-    )
+    Text(text = zodiac.symbol, color = zodiac.color, fontSize = 64.sp, textAlign = TextAlign.Center)
     Spacer(modifier = Modifier.height(8.dp))
-    Text(
-        text = zodiac.name.uppercase(),
-        color = Color.White,
-        fontSize = 24.sp,
-        fontWeight = FontWeight.Bold,
-        letterSpacing = 4.sp,
-        textAlign = TextAlign.Center
-    )
+    Text(text = zodiac.name.uppercase(), color = Color.White, fontSize = 24.sp, fontWeight = FontWeight.Bold, letterSpacing = 4.sp, textAlign = TextAlign.Center)
     Spacer(modifier = Modifier.height(4.dp))
-    Text(
-        text = "ELEMENTO ${zodiac.element}",
-        color = zodiac.color,
-        fontSize = 11.sp,
-        letterSpacing = 2.sp,
-        textAlign = TextAlign.Center
-    )
+    Text(text = "ELEMENTO ${zodiac.element}", color = zodiac.color, fontSize = 11.sp, letterSpacing = 2.sp, textAlign = TextAlign.Center)
     Spacer(modifier = Modifier.height(4.dp))
-    Text(
-        text = "DAILY ENERGY",
-        color = SubtitleColor,
-        fontSize = 11.sp,
-        letterSpacing = 3.sp,
-        textAlign = TextAlign.Center
-    )
+    Text(text = "DAILY ENERGY", color = SubtitleColor, fontSize = 11.sp, letterSpacing = 3.sp, textAlign = TextAlign.Center)
 }
 
 @Composable
 private fun EnergyMessageCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(CardBackground)
-            .padding(20.dp)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "Mensagem do Dia",
-                color = Color.White,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+            Text(text = "Mensagem do Dia", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(text = "✦", color = zodiac.color, fontSize = 18.sp)
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Text(
-            text = zodiac.styleMessage,
-            color = SubtitleColor,
-            fontSize = 13.sp,
-            lineHeight = 22.sp
-        )
+        Text(text = zodiac.styleMessage, color = SubtitleColor, fontSize = 13.sp, lineHeight = 22.sp)
     }
 }
 
 @Composable
 private fun ConfidenceMeterCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(CardBackground)
-            .padding(20.dp)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "CONFIDENCE METER",
-                color = zodiac.color,
-                fontSize = 11.sp,
-                letterSpacing = 1.sp,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = zodiac.energy,
-                color = zodiac.color,
-                fontSize = 11.sp,
-                fontWeight = FontWeight.Bold
-            )
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
+            Text(text = "CONFIDENCE METER", color = zodiac.color, fontSize = 11.sp, letterSpacing = 1.sp, fontWeight = FontWeight.Medium)
+            Text(text = zodiac.energy, color = zodiac.color, fontSize = 11.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(6.dp)
-                .clip(RoundedCornerShape(3.dp))
-                .background(Color(0xFF2C2C2C))
-        ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth(zodiac.confidence)
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp))
-                    .background(zodiac.color)
-            )
+        Box(modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(Color(0xFF2C2C2C))) {
+            Box(modifier = Modifier.fillMaxWidth(zodiac.confidence).height(6.dp).clip(RoundedCornerShape(3.dp)).background(zodiac.color))
         }
     }
 }
@@ -291,33 +206,17 @@ private fun ConfidenceMeterCard(zodiac: ZodiacInfo) {
 @Composable
 private fun ColorPaletteCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(RoundedCornerShape(20.dp))
-            .background(CardBackground)
-            .padding(20.dp)
+        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
     ) {
-        Text(
-            text = "PALETA DO DIA",
-            color = Color.White,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            letterSpacing = 2.sp
-        )
+        Text(text = "PALETA DO DIA", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = 2.sp)
         Spacer(modifier = Modifier.height(16.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             zodiac.colorPalette.take(2).forEach { (color, label) ->
                 PaletteChip(color = color, label = label, modifier = Modifier.weight(1f))
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             zodiac.colorPalette.drop(2).forEach { (color, label) ->
                 PaletteChip(color = color, label = label, modifier = Modifier.weight(1f))
             }
@@ -328,20 +227,8 @@ private fun ColorPaletteCard(zodiac: ZodiacInfo) {
 @Composable
 private fun PaletteChip(color: Color, label: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .size(80.dp)
-                .clip(RoundedCornerShape(12.dp))
-                .background(color)
-        )
+        Box(modifier = Modifier.fillMaxWidth().size(80.dp).clip(RoundedCornerShape(12.dp)).background(color))
         Spacer(modifier = Modifier.height(6.dp))
-        Text(
-            text = label,
-            color = SubtitleColor,
-            fontSize = 9.sp,
-            letterSpacing = 1.sp,
-            textAlign = TextAlign.Center
-        )
+        Text(text = label, color = SubtitleColor, fontSize = 9.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center)
     }
 }
