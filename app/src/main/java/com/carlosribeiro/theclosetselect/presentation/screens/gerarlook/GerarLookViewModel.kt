@@ -14,6 +14,7 @@ import com.carlosribeiro.theclosetselect.data.remote.WeatherService
 import com.carlosribeiro.theclosetselect.data.repository.GarmentRepositoryImpl
 import com.carlosribeiro.theclosetselect.data.repository.PaletteRepositoryImpl
 import com.carlosribeiro.theclosetselect.domain.model.Garment
+import com.carlosribeiro.theclosetselect.domain.model.GarmentCategory
 import com.carlosribeiro.theclosetselect.domain.model.PaletteResult
 import com.google.android.gms.location.LocationServices
 import com.google.android.gms.location.Priority
@@ -35,10 +36,15 @@ import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
 import java.util.concurrent.TimeUnit
 
+data class LookPiece(
+    val name: String = "",
+    val photoUrl: String = ""
+)
+
 data class Look(
     val title: String = "",
     val description: String = "",
-    val pieces: List<String> = emptyList(),
+    val pieces: List<LookPiece> = emptyList(),
     val colorTip: String = ""
 )
 
@@ -146,15 +152,14 @@ class GerarLookViewModel(application: Application) : AndroidViewModel(applicatio
             _uiState.update { it.copy(isGenerating = true, errorMessage = null) }
 
             try {
-                val userDoc = FirebaseFirestore.getInstance()
+                val userDoc    = FirebaseFirestore.getInstance()
                     .collection("users").document(userId).get().await()
                 val zodiacSign = userDoc.getString("zodiacSign") ?: "Leão"
+                val palette    = paletteRepository.getPalette(userId)
+                val garments   = garmentRepository.getGarments(userId).first()
+                val weather    = _uiState.value.weather
 
-                val palette  = paletteRepository.getPalette(userId)
-                val garments = garmentRepository.getGarments(userId).first()
-
-                val weather = _uiState.value.weather
-                val looks   = generateWithGemini(
+                val looks = generateWithGemini(
                     zodiacSign = zodiacSign,
                     weather    = weather,
                     palette    = palette,
@@ -188,9 +193,11 @@ class GerarLookViewModel(application: Application) : AndroidViewModel(applicatio
                     "Melhores cores: ${it.bestColors.joinToString(", ") { c -> c.nome }}"
         } ?: "Paleta não disponível"
 
-        // Lista numerada para forçar o modelo a referenciar peças exatas
+        // Remove "All Items" do prompt — envia só o tipo quando categoria não foi definida
         val garmentsList = garments.mapIndexed { index, g ->
-            "${index + 1}. ${g.name} (${g.type.displayName}, ${g.category.displayName})"
+            val categoryInfo = if (g.category == GarmentCategory.ALL) ""
+            else ", ${g.category.displayName}"
+            "${index + 1}. ${g.name} (${g.type.displayName}$categoryInfo)"
         }.joinToString("\n")
 
         val totalGarments = garments.size
@@ -261,13 +268,22 @@ class GerarLookViewModel(application: Application) : AndroidViewModel(applicatio
             .trim()
 
         val looksJson = JSONObject(text).getJSONArray("looks")
+
+        // Mapa de nome → photoUrl para cruzar peças do Gemini com fotos do guarda-roupa
+        val photoMap = garments.associate { it.name.trim().lowercase() to it.photoUrl }
+
         (0 until looksJson.length()).map { i ->
             val look        = looksJson.getJSONObject(i)
             val piecesArray = look.getJSONArray("pieces")
+            val pieces = (0 until piecesArray.length()).map { j ->
+                val pieceName = piecesArray.getString(j)
+                val photoUrl  = photoMap[pieceName.trim().lowercase()] ?: ""
+                LookPiece(name = pieceName, photoUrl = photoUrl)
+            }
             Look(
                 title       = look.getString("title"),
                 description = look.getString("description"),
-                pieces      = (0 until piecesArray.length()).map { piecesArray.getString(it) },
+                pieces      = pieces,
                 colorTip    = look.getString("colorTip")
             )
         }
