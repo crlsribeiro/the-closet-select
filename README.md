@@ -89,7 +89,13 @@ OkHttp
 Kotlinx Serialization
 Accompanist Permissions
 📸 Screens
-<p align="center"> <img src="app/screenshots/01_Splash.png" width="180"/> <img src="app/screenshots/02_CreateAccount.png" width="180"/> <img src="app/screenshots/03_ForgotPassword.png" width="180"/> <img src="app/screenshots/04_Home.png" width="180"/> <img src="app/screenshots/05_TheArchive.png" width="180"/> </p>
+<p align="center">
+  <img src="app/screenshots/01_Splash.png" width="180"/>
+  <img src="app/screenshots/02_CreateAccount.png" width="180"/>
+  <img src="app/screenshots/03_ForgotPassword.png" width="180"/>
+  <img src="app/screenshots/04_Home.png" width="180"/>
+  <img src="app/screenshots/05_TheArchive.png" width="180"/>
+</p>
 🔑 Firebase Setup
 
 Add your own google-services.json file inside the app/ directory.
