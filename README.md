@@ -52,6 +52,11 @@ presentation/
 ├── navigation
 ├── components
 
+Principles:
+UI driven by StateFlow
+Business logic isolated in use cases
+Repository pattern
+Clear separation of concerns
 🚀 Features
 🔐 Firebase Authentication (Email/Password + Google Sign-In)
 👤 User profile with automatic zodiac calculation
@@ -85,3 +90,40 @@ Kotlinx Serialization
 Accompanist Permissions
 📸 Screens
 <p align="center"> <img src="app/screenshots/01_Splash.png" width="180"/> <img src="app/screenshots/02_CreateAccount.png" width="180"/> <img src="app/screenshots/03_ForgotPassword.png" width="180"/> <img src="app/screenshots/04_Home.png" width="180"/> <img src="app/screenshots/05_TheArchive.png" width="180"/> </p>
+🔑 Firebase Setup
+
+Add your own google-services.json file inside the app/ directory.
+
+This file is not included in the repository for security reasons.
+
+🔑 Environment Setup
+
+Sensitive keys must be provided via:
+
+local.properties
+environment variables (CI/CD)
+GOOGLE_WEB_CLIENT_ID=...
+GEMINI_API_KEY=...
+WEATHER_API_KEY=...
+▶️ Running the Project
+Clone the repository
+Add API keys to local.properties
+Add your google-services.json
+Sync Gradle
+Run on emulator or device
+📊 Code Quality
+SonarQube / SonarCloud integration
+Android Lint
+Clean architecture enforcement
+State-driven UI
+🔐 Security
+Firebase Auth for authentication
+Firestore rules per user
+API keys outside version control
+No sensitive data committed
+💡 Why This Project Stands Out
+Real-world architecture (not tutorial-level)
+AI-powered feature with real use case
+Multiple integrations (Firebase, Weather, AI)
+Strong UI/UX consistency
+End-to-end product thinking
