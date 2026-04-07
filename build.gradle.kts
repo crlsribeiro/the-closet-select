@@ -15,5 +15,6 @@ sonar {
         property("sonar.projectKey", "carlosaoribeiro_theclosetselect")
         property("sonar.organization", "carlosaoribeiro")
         property("sonar.host.url", "https://sonarcloud.io")
+        property("sonar.androidLint.reportPaths", "app/build/reports/lint-results-debug.xml")
     }
 }
