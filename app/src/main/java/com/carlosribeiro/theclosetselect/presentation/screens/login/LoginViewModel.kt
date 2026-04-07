@@ -28,7 +28,7 @@ class LoginViewModel : ViewModel() {
         _uiState.update { it.copy(password = newPassword, errorMessage = null) }
 
     fun onLoginClick() {
-        val email = _uiState.value.email.trim()
+        val email    = _uiState.value.email.trim()
         val password = _uiState.value.password
 
         if (email.isBlank() || password.isBlank()) {
@@ -42,14 +42,12 @@ class LoginViewModel : ViewModel() {
                 auth.signInWithEmailAndPassword(email, password).await()
                 _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "E-mail ou senha inválidos.") }
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "E-mail ou senha inválidos.")
+                }
             }
         }
     }
-
-    // Chamado antes de abrir o intent do Google para mostrar loading imediatamente
-    fun onGoogleSignInStarted() =
-        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
     fun onGoogleSignInResult(idToken: String) {
         viewModelScope.launch {
@@ -59,10 +57,19 @@ class LoginViewModel : ViewModel() {
                 auth.signInWithCredential(credential).await()
                 _uiState.update { it.copy(isLoading = false, isLoginSuccess = true) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Falha no login com Google.") }
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "Falha no login com Google.")
+                }
             }
         }
     }
+
+    fun onGoogleSignInError() {
+        _uiState.update { it.copy(isLoading = false, errorMessage = "Falha no login com Google.") }
+    }
+
+    fun onGoogleSignInStarted() =
+        _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
     fun onForgotPasswordClick(email: String) {
         if (email.isBlank()) {
@@ -75,7 +82,9 @@ class LoginViewModel : ViewModel() {
                 auth.sendPasswordResetEmail(email.trim()).await()
                 _uiState.update { it.copy(isLoading = false) }
             } catch (e: Exception) {
-                _uiState.update { it.copy(isLoading = false, errorMessage = "Não foi possível enviar o e-mail.") }
+                _uiState.update {
+                    it.copy(isLoading = false, errorMessage = "Não foi possível enviar o e-mail.")
+                }
             }
         }
     }
