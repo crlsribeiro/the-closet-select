@@ -8,6 +8,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.*
@@ -58,7 +59,8 @@ fun HomeScreen(
     onNavigateToGerarLook: () -> Unit,
     onNavigateToDailyEnergy: () -> Unit,
     onNavigateToAuraPalette: () -> Unit,
-    onNavigateToArchive: () -> Unit
+    onNavigateToArchive: () -> Unit,
+    onNavigateToProfile: () -> Unit          // ← novo parâmetro
 ) {
     val paletteRepository = remember { PaletteRepositoryImpl() }
     var paletteColors by remember { mutableStateOf<List<PaletteColor>>(defaultPaletteColors) }
@@ -83,14 +85,55 @@ fun HomeScreen(
             Spacer(modifier = Modifier.height(32.dp))
             ArchiveSection(onNavigateToArchive = onNavigateToArchive)
             Spacer(modifier = Modifier.height(32.dp))
+            MyProfileCard(onNavigateToProfile = onNavigateToProfile)  // ← novo card
+            Spacer(modifier = Modifier.height(32.dp))
+            HomeFooter(onLogout = onLogout)
         }
     }
 }
 
 @Composable
 private fun HomeTopBar() {
-    Box(modifier = Modifier.fillMaxWidth().padding(horizontal = 24.dp, vertical = 16.dp), contentAlignment = Alignment.Center) {
-        Text(text = "THE CLOSET SELECT", color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Light, letterSpacing = 3.sp)
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .statusBarsPadding()
+            .padding(horizontal = 24.dp, vertical = 12.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = "THE CLOSET SELECT",
+            color = Color.White,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Light,
+            letterSpacing = 3.sp
+        )
+    }
+}
+
+@Composable
+private fun HomeFooter(onLogout: () -> Unit) {
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .navigationBarsPadding()
+            .padding(bottom = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        HorizontalDivider(
+            color = Color(0xFF2A2A2A),
+            thickness = 0.5.dp,
+            modifier = Modifier.padding(horizontal = 16.dp)
+        )
+        Spacer(modifier = Modifier.height(8.dp))
+        TextButton(onClick = onLogout) {
+            Text(
+                text = "Logout",
+                color = SubtitleColor,
+                fontSize = 13.sp,
+                letterSpacing = 1.sp
+            )
+        }
     }
 }
 
@@ -153,7 +196,7 @@ private fun AuraPaletteSection(
         Text(text = "AURA PALETTE", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = 2.sp)
         Spacer(modifier = Modifier.height(16.dp))
 
-        val firstRow: List<PaletteColor> = paletteColors.take(2)
+        val firstRow: List<PaletteColor>  = paletteColors.take(2)
         val secondRow: List<PaletteColor> = paletteColors.drop(2).take(2)
 
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
@@ -220,5 +263,71 @@ private fun ArchiveItemCard(item: ArchiveItem, onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(8.dp))
         Text(text = item.name, color = Color.White, fontSize = 13.sp, fontWeight = FontWeight.Bold, maxLines = 1, overflow = TextOverflow.Ellipsis)
         Text(text = item.category, color = SubtitleColor, fontSize = 10.sp, letterSpacing = 1.sp)
+    }
+}
+
+// ── Card Meu Perfil ───────────────────────────────────────────────────────────
+@Composable
+private fun MyProfileCard(onNavigateToProfile: () -> Unit) {
+    val currentUser = FirebaseAuth.getInstance().currentUser
+    val initial = (currentUser?.displayName?.firstOrNull()
+        ?: currentUser?.email?.firstOrNull()
+        ?: '?').uppercaseChar().toString()
+    val email = currentUser?.email ?: ""
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp)
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBackground)
+            .clickable { onNavigateToProfile() }
+            .padding(20.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            // Avatar inicial
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .clip(RoundedCornerShape(12.dp))
+                    .background(Color(0xFF2A2418)),
+                contentAlignment = Alignment.Center
+            ) {
+                Text(
+                    text = initial,
+                    color = GoldColor,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Spacer(modifier = Modifier.width(14.dp))
+
+            Column {
+                Text(
+                    text = "Meu Perfil",
+                    color = Color.White,
+                    fontSize = 15.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = email,
+                    color = SubtitleColor,
+                    fontSize = 12.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+
+        // Chevron
+        Text(
+            text = "›",
+            color = SubtitleColor,
+            fontSize = 24.sp,
+            fontWeight = FontWeight.Light
+        )
     }
 }

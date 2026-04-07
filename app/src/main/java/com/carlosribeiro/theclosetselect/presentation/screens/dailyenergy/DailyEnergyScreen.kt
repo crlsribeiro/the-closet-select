@@ -128,7 +128,6 @@ fun DailyEnergyScreen() {
                 .document(uid)
                 .get()
                 .addOnSuccessListener { doc ->
-                    // Corrigido: campo correto é "zodiacSign"
                     val sign = doc.getString("zodiacSign")
                     if (!sign.isNullOrBlank()) userSign = sign
                 }
@@ -146,7 +145,7 @@ fun DailyEnergyScreen() {
             modifier = Modifier
                 .fillMaxSize()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = 24.dp)
+                .padding(horizontal = 16.dp)        // ← era 24.dp, agora igual aos outros cards
                 .padding(top = 48.dp, bottom = 32.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -176,9 +175,17 @@ private fun DailyEnergyHeader(zodiac: ZodiacInfo) {
 @Composable
 private fun EnergyMessageCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBackground)
+            .padding(20.dp)
     ) {
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween, verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             Text(text = "Mensagem do Dia", color = Color.White, fontSize = 16.sp, fontWeight = FontWeight.Bold)
             Text(text = "✦", color = zodiac.color, fontSize = 18.sp)
         }
@@ -190,15 +197,31 @@ private fun EnergyMessageCard(zodiac: ZodiacInfo) {
 @Composable
 private fun ConfidenceMeterCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBackground)
+            .padding(20.dp)
     ) {
         Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
             Text(text = "CONFIDENCE METER", color = zodiac.color, fontSize = 11.sp, letterSpacing = 1.sp, fontWeight = FontWeight.Medium)
             Text(text = zodiac.energy, color = zodiac.color, fontSize = 11.sp, fontWeight = FontWeight.Bold)
         }
         Spacer(modifier = Modifier.height(10.dp))
-        Box(modifier = Modifier.fillMaxWidth().height(6.dp).clip(RoundedCornerShape(3.dp)).background(Color(0xFF2C2C2C))) {
-            Box(modifier = Modifier.fillMaxWidth(zodiac.confidence).height(6.dp).clip(RoundedCornerShape(3.dp)).background(zodiac.color))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(6.dp)
+                .clip(RoundedCornerShape(3.dp))
+                .background(Color(0xFF2C2C2C))
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth(zodiac.confidence)
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp))
+                    .background(zodiac.color)
+            )
         }
     }
 }
@@ -206,17 +229,33 @@ private fun ConfidenceMeterCard(zodiac: ZodiacInfo) {
 @Composable
 private fun ColorPaletteCard(zodiac: ZodiacInfo) {
     Column(
-        modifier = Modifier.fillMaxWidth().clip(RoundedCornerShape(20.dp)).background(CardBackground).padding(20.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(RoundedCornerShape(20.dp))
+            .background(CardBackground)
+            .padding(20.dp)
     ) {
-        Text(text = "PALETA DO DIA", color = Color.White, fontSize = 14.sp, fontWeight = FontWeight.Medium, letterSpacing = 2.sp)
+        Text(
+            text = "PALETA DO DIA",
+            color = Color.White,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            letterSpacing = 2.sp
+        )
         Spacer(modifier = Modifier.height(16.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             zodiac.colorPalette.take(2).forEach { (color, label) ->
                 PaletteChip(color = color, label = label, modifier = Modifier.weight(1f))
             }
         }
         Spacer(modifier = Modifier.height(12.dp))
-        Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
             zodiac.colorPalette.drop(2).forEach { (color, label) ->
                 PaletteChip(color = color, label = label, modifier = Modifier.weight(1f))
             }
@@ -224,11 +263,24 @@ private fun ColorPaletteCard(zodiac: ZodiacInfo) {
     }
 }
 
+// ── PaletteChip responsivo ────────────────────────────────────────────────────
 @Composable
 private fun PaletteChip(color: Color, label: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, horizontalAlignment = Alignment.CenterHorizontally) {
-        Box(modifier = Modifier.fillMaxWidth().size(80.dp).clip(RoundedCornerShape(12.dp)).background(color))
+        Box(
+            modifier = Modifier
+                .fillMaxWidth()
+                .aspectRatio(1f)                    // ← quadrado responsivo, se adapta a qualquer tela
+                .clip(RoundedCornerShape(12.dp))
+                .background(color)
+        )
         Spacer(modifier = Modifier.height(6.dp))
-        Text(text = label, color = SubtitleColor, fontSize = 9.sp, letterSpacing = 1.sp, textAlign = TextAlign.Center)
+        Text(
+            text = label,
+            color = SubtitleColor,
+            fontSize = 9.sp,
+            letterSpacing = 1.sp,
+            textAlign = TextAlign.Center
+        )
     }
 }

@@ -1,5 +1,7 @@
 package com.carlosribeiro.theclosetselect.presentation.screens.register
 
+import androidx.compose.ui.text.TextRange
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.carlosribeiro.theclosetselect.data.model.User
@@ -14,7 +16,7 @@ data class RegisterState(
     val firstName: String = "",
     val lastName: String = "",
     val email: String = "",
-    val birthDate: String = "",
+    val birthDate: TextFieldValue = TextFieldValue(""),  // ← TextFieldValue para cursor correto
     val zodiacSign: String = "",
     val password: String = "",
     val confirmPassword: String = "",
@@ -23,8 +25,6 @@ data class RegisterState(
     val errorMessage: String? = null,
     val isBrazilianLocale: Boolean = true
 ) {
-    val isDateFormatBrazilian: Boolean get() = isBrazilianLocale
-
     val dateHint: String get() = if (isBrazilianLocale) "DD/MM/AAAA" else "MM/DD/YYYY"
 
     val canSave: Boolean
@@ -33,7 +33,7 @@ data class RegisterState(
                 isEmailValid(email) &&
                 password.length >= 6 &&
                 password == confirmPassword &&
-                birthDate.length == 10
+                birthDate.text.length == 10
 }
 
 private fun isEmailValid(email: String): Boolean {
@@ -49,9 +49,7 @@ class RegisterViewModel(
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(
-        RegisterState(
-            isBrazilianLocale = Locale.getDefault().language == "pt"
-        )
+        RegisterState(isBrazilianLocale = Locale.getDefault().language == "pt")
     )
     val uiState = _uiState.asStateFlow()
 
@@ -70,13 +68,33 @@ class RegisterViewModel(
     fun onConfirmPasswordChange(password: String) =
         _uiState.update { it.copy(confirmPassword = password, errorMessage = null) }
 
-    fun onDateOfBirthChange(date: String) {
-        val formatted = formatDateInput(date, _uiState.value.isBrazilianLocale)
-        _uiState.update { it.copy(birthDate = formatted, errorMessage = null) }
+    fun onDateOfBirthChange(input: TextFieldValue) {
+        val digits = input.text.filter { it.isDigit() }.take(8)
 
-        if (formatted.length == 10) {
-            val sign = calculateZodiacSign(formatted, _uiState.value.isBrazilianLocale)
-            _uiState.update { it.copy(zodiacSign = sign) }
+        val masked = buildString {
+            digits.forEachIndexed { index, char ->
+                if (index == 2 || index == 4) append('/')
+                append(char)
+            }
+        }
+
+        // Recalcula cursor levando em conta as barras inseridas automaticamente
+        val digitsBeforeCursor = input.text.take(input.selection.end).count { it.isDigit() }
+        val extraSlashes = when {
+            digitsBeforeCursor > 4 -> 2
+            digitsBeforeCursor > 2 -> 1
+            else                   -> 0
+        }
+        val newCursor = (digitsBeforeCursor + extraSlashes).coerceAtMost(masked.length)
+
+        val newValue = TextFieldValue(text = masked, selection = TextRange(newCursor))
+
+        val zodiacSign = if (masked.length == 10) {
+            calculateZodiacSign(masked, _uiState.value.isBrazilianLocale)
+        } else ""
+
+        _uiState.update {
+            it.copy(birthDate = newValue, zodiacSign = zodiacSign, errorMessage = null)
         }
     }
 
@@ -104,9 +122,9 @@ class RegisterViewModel(
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
 
             val newUser = User(
-                name = "${state.firstName} ${state.lastName}",
-                email = state.email,
-                birthDate = state.birthDate,
+                displayName       = "${state.firstName} ${state.lastName}",
+                email      = state.email,
+                birthdate  = state.birthDate.text,   // ← era birthDate
                 zodiacSign = state.zodiacSign
             )
 
@@ -117,7 +135,7 @@ class RegisterViewModel(
                 .onFailure { error ->
                     _uiState.update {
                         it.copy(
-                            isLoading = false,
+                            isLoading    = false,
                             errorMessage = error.localizedMessage ?: "Erro ao cadastrar. Tente novamente."
                         )
                     }
@@ -125,22 +143,11 @@ class RegisterViewModel(
         }
     }
 
-    private fun formatDateInput(input: String, isBrazilian: Boolean): String {
-        val digits = input.filter { it.isDigit() }.take(8)
-        return buildString {
-            digits.forEachIndexed { index, char ->
-                if (index == 2 || index == 4) append("/")
-                append(char)
-            }
-        }
-    }
-
     private fun calculateZodiacSign(date: String, isBrazilian: Boolean): String {
         return try {
             val parts = date.split("/")
-            val day = if (isBrazilian) parts[0].toInt() else parts[1].toInt()
+            val day   = if (isBrazilian) parts[0].toInt() else parts[1].toInt()
             val month = if (isBrazilian) parts[1].toInt() else parts[0].toInt()
-
             when (month) {
                 1  -> if (day < 20) "Capricórnio" else "Aquário"
                 2  -> if (day < 19) "Aquário" else "Peixes"
@@ -156,8 +163,6 @@ class RegisterViewModel(
                 12 -> if (day < 22) "Sagitário" else "Capricórnio"
                 else -> ""
             }
-        } catch (e: Exception) {
-            ""
-        }
+        } catch (_: Exception) { "" }
     }
 }

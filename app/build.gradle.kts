@@ -44,6 +44,12 @@ android {
             "GEMINI_API_KEY",
             "\"${System.getenv("GEMINI_API_KEY") ?: localProperties.getProperty("GEMINI_API_KEY", "")}\""
         )
+
+        buildConfigField(
+            "String",
+            "WEATHER_API_KEY",
+            "\"${System.getenv("WEATHER_API_KEY") ?: localProperties.getProperty("WEATHER_API_KEY", "")}\""
+        )
     }
 
     signingConfigs {
@@ -111,7 +117,12 @@ dependencies {
     implementation("com.google.firebase:firebase-storage-ktx")
 
     // Google Sign-In
-    implementation("com.google.android.gms:play-services-auth:21.2.0")
+    implementation("androidx.credentials:credentials:1.3.0")
+    implementation("androidx.credentials:credentials-play-services-auth:1.3.0")
+    implementation("com.google.android.libraries.identity.googleid:googleid:1.1.1")
+
+    // Google Location
+    implementation("com.google.android.gms:play-services-location:21.3.0")
 
     // Icons
     implementation("androidx.compose.material:material-icons-extended")
