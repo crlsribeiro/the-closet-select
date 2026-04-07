@@ -8,12 +8,12 @@ An Android app that delivers **context-aware outfit recommendations** by combini
 
 ## 🔍 Overview
 
-- 📱 Android app built with Kotlin + Jetpack Compose  
-- 🧠 AI-powered outfit generation (Google Gemini)  
-- 🌤️ Real-time weather integration  
-- 🎨 Personalized color palette system  
-- 🔐 Firebase Authentication & Firestore backend  
-- 🧱 Clean Architecture (Data / Domain / Presentation)  
+- 📱 Android app built with Kotlin + Jetpack Compose
+- 🧠 AI-powered outfit generation (Google Gemini)
+- 🌤️ Real-time weather integration
+- 🎨 Personalized color palette system
+- 🔐 Firebase Authentication & Firestore backend
+- 🧱 Clean Architecture (Data / Domain / Presentation)
 
 ---
 
@@ -23,9 +23,9 @@ Getting dressed is often repetitive and disconnected from context.
 
 **The Closet Select** transforms your wardrobe into an intelligent system that considers:
 
-- Your available clothes  
-- Current weather conditions  
-- Personalized color palette  
+- Your available clothes
+- Current weather conditions
+- Personalized color palette
 - Context-aware signals (user profile + preferences)
 
 Instead of generic suggestions, the app generates **highly personalized outfit combinations using your own wardrobe**.
@@ -52,7 +52,8 @@ presentation/
 ├── navigation
 ├── components
 
-Principles:
+
+Principles
 UI driven by StateFlow
 Business logic isolated in use cases
 Repository pattern
@@ -67,6 +68,7 @@ Clear separation of concerns
 ✨ Daily context screen with confidence indicator
 🔄 Real-time sync with Firestore
 🌑 Premium dark UI with gold accents
+
 🛠️ Tech Stack
 Core
 Kotlin
@@ -89,47 +91,5 @@ OkHttp
 Kotlinx Serialization
 Accompanist Permissions
 📸 Screens
-<p align="center">
-  <img src="app/screenshots/01_Splash.png" width="180"/>
-  <img src="app/screenshots/02_CreateAccount.png" width="180"/>
-  <img src="app/screenshots/03_ForgotPassword.png" width="180"/>
-  <img src="app/screenshots/04_Home.png" width="180"/>
-  <img src="app/screenshots/05_TheArchive.png" width="180"/>
-</p>
-🔑 Firebase Setup
+<p align="center"> <img src="app/screenshots/01_Splash.png" width="180" alt="Splash Screen"/> <img src="app/screenshots/02_CreateAccount.png" width="180" alt="Create Account Screen"/> <img src="app/screenshots/03_ForgotPassword.png" width="180" alt="Forgot Password Screen"/> <img src="app/screenshots/04_Home.png" width="180" alt="Home Screen"/> <img src="app/screenshots/05_TheArchive.png" width="180" alt="Archive Screen"/> </p>
 
-Add your own google-services.json file inside the app/ directory.
-
-This file is not included in the repository for security reasons.
-
-🔑 Environment Setup
-
-Sensitive keys must be provided via:
-
-local.properties
-environment variables (CI/CD)
-GOOGLE_WEB_CLIENT_ID=...
-GEMINI_API_KEY=...
-WEATHER_API_KEY=...
-▶️ Running the Project
-Clone the repository
-Add API keys to local.properties
-Add your google-services.json
-Sync Gradle
-Run on emulator or device
-📊 Code Quality
-SonarQube / SonarCloud integration
-Android Lint
-Clean architecture enforcement
-State-driven UI
-🔐 Security
-Firebase Auth for authentication
-Firestore rules per user
-API keys outside version control
-No sensitive data committed
-💡 Why This Project Stands Out
-Real-world architecture (not tutorial-level)
-AI-powered feature with real use case
-Multiple integrations (Firebase, Weather, AI)
-Strong UI/UX consistency
-End-to-end product thinking
