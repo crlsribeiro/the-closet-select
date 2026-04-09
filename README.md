@@ -1,4 +1,4 @@
-# 👗 The Closet Select
+# 🪡 The Closet Select
 
 ![Repo Views](https://komarev.com/ghpvc/?username=crlsribeiro&repo=the-closet-select&color=FFD700)
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
