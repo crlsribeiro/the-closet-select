@@ -4,7 +4,6 @@
 ![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
 ![Android](https://img.shields.io/badge/Android-SDK%2026+-3DDC84?logo=android&logoColor=white)
 ![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-4285F4?logo=jetpackcompose&logoColor=white)
-![CI](https://github.com/crlsribeiro/the-closet-select/actions/workflows/android.yml/badge.svg)
 
 An Android app that delivers **context-aware outfit recommendations** by combining personal wardrobe data, weather conditions, color analysis, and AI.
 
