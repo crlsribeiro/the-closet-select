@@ -1,6 +1,10 @@
 # 👗 The Closet Select
 
-![Repo Views](https://komarev.com/ghpvc/?username=crlsribeiro&repo=the-closet-select&color=gold)
+![Repo Views](https://komarev.com/ghpvc/?username=crlsribeiro&repo=the-closet-select&color=FFD700)
+![Kotlin](https://img.shields.io/badge/Kotlin-2.0-7F52FF?logo=kotlin&logoColor=white)
+![Android](https://img.shields.io/badge/Android-SDK%2026+-3DDC84?logo=android&logoColor=white)
+![Jetpack Compose](https://img.shields.io/badge/Jetpack%20Compose-UI-4285F4?logo=jetpackcompose&logoColor=white)
+![CI](https://github.com/crlsribeiro/the-closet-select/actions/workflows/android.yml/badge.svg)
 
 An Android app that delivers **context-aware outfit recommendations** by combining personal wardrobe data, weather conditions, color analysis, and AI.
 
@@ -34,7 +38,7 @@ Instead of generic suggestions, the app generates **highly personalized outfit c
 
 ## 🧱 Architecture
 
-The project follows a **Clean Architecture** approach:
+The project follows a **Clean Architecture** approach with clear separation between layers:
 
 ```text
 data/
@@ -53,12 +57,16 @@ presentation/
 └── components/
 ```
 
+**Why Clean Architecture?**
+
+The domain layer is completely decoupled from the Android framework, which means use cases can be unit tested without any Android dependency. The repository pattern abstracts the data sources (Firestore, OpenWeather, Gemini), so the domain layer never knows whether data comes from the network or cache. This also makes it straightforward to swap or mock any data source in tests.
+
 **Principles:**
 
-- UI driven by `StateFlow`
-- Business logic isolated in use cases
-- Repository pattern
-- Clear separation of concerns
+- UI driven by `StateFlow` — single source of truth for UI state
+- Business logic isolated in use cases — each use case has a single responsibility
+- Repository pattern — data source details are hidden from the domain
+- Clear separation of concerns — no Android imports in the domain layer
 
 ---
 
@@ -86,6 +94,7 @@ presentation/
 | Jetpack Compose | UI framework |
 | MVVM + StateFlow | State management |
 | Clean Architecture | Project structure |
+| Hilt | Dependency injection |
 
 ### Backend & Services
 
@@ -113,6 +122,18 @@ presentation/
 | OkHttp | HTTP client |
 | Kotlinx Serialization | JSON parsing |
 | Accompanist Permissions | Runtime permissions |
+
+---
+
+## 🧪 Tests
+
+Testing strategy follows the same layer separation as the architecture:
+
+- **Unit tests** — use cases and ViewModels tested with JUnit + MockK, without Android dependencies
+- **Flow testing** — `StateFlow` and `Flow` emissions verified with Turbine
+- **Repository tests** — data layer tested with fakes, no real network or Firestore calls
+
+> Tests are currently in progress as part of ongoing development.
 
 ---
 
@@ -159,6 +180,4 @@ presentation/
 
 ## 📄 License
 
-```
 MIT License — feel free to use, modify, and distribute.
-```
